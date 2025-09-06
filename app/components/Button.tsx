@@ -2,6 +2,7 @@
 
 import React from "react";
 import { IconType } from "react-icons";
+import { BiLoader } from "react-icons/bi";
 
 interface ButtonProps {
   label: string;
@@ -32,6 +33,7 @@ const Button: React.FC<ButtonProps> = ({
         hover:opacity-80
         transition
         w-full
+        cursor-pointer
         ${outline ? "bg-white" : "bg-rose-500"}
         ${outline ? "border-black" : "border-rose-500"}
         ${outline ? "text-black" : "text-white"}
@@ -52,7 +54,10 @@ const Button: React.FC<ButtonProps> = ({
                 "
         />
       )}
-      {label}
+      <div className="flex items-center justify-center gap-2 ">
+        {label}
+        {disabled && <BiLoader className="size-5 animate-spin" />}
+      </div>
     </button>
   );
 };

@@ -1,7 +1,7 @@
 "use client";
 
+import { signIn } from "next-auth/react";
 import Modal from "./Modal";
-import axios from "axios";
 import { useState } from "react";
 
 import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
@@ -11,13 +11,14 @@ import toast from "react-hot-toast";
 import Button from "../Button";
 import { FcGoogle } from "react-icons/fc";
 import { AiFillGithub } from "react-icons/ai";
-import useRegisterModal from "@/app/hooks/useRegisterModal";
 import useLoginModal from "@/app/hooks/useLoginModal";
-import { signIn } from "next-auth/react";
+import useRegisterModal from "@/app/hooks/useRegisterModal";
+import { useRouter } from "next/navigation";
 
-const RegisterModal = () => {
-  const loginModal = useLoginModal();
+const LoginModal = () => {
+  const router = useRouter();
   const registerModal = useRegisterModal();
+  const loginModal = useLoginModal();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -27,7 +28,6 @@ const RegisterModal = () => {
     formState: { errors },
   } = useForm<FieldValues>({
     defaultValues: {
-      name: "",
       email: "",
       password: "",
     },
@@ -36,37 +36,32 @@ const RegisterModal = () => {
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
 
-    axios
-      .post("/api/register", data)
-      .then(() => {
-        registerModal.onClose();
+    signIn("credentials", {
+      ...data,
+      redirect: false,
+    }).then((callback) => {
+      setIsLoading(false);
+
+      if (callback?.ok) {
+        toast.success("Logged in");
+        router.refresh();
+        loginModal.onClose();
         reset();
-        toast.success("Account created successfully!");
-      })
-      .catch((err) => {
-        console.log("err -> ", err);
-        toast.error("Something went wrong!");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      }
+
+      if (callback?.error) {
+        toast.error(callback.error);
+      }
+    });
   };
 
   const bodyContent = (
     <div className="flex flex-col gap-4">
-      <Heading title="Welcome to Airbnb" subTitle="Create an account" />
+      <Heading title="Welcome back" subTitle="Log in to your account" />
       <Input
         id="email"
         label="Email"
         type="email"
-        disabled={isLoading}
-        register={register}
-        errors={errors}
-        required
-      />
-      <Input
-        id="name"
-        label="Name"
         disabled={isLoading}
         register={register}
         errors={errors}
@@ -101,11 +96,11 @@ const RegisterModal = () => {
       />
       <div className="text-neutral-500 text-center mt-4 font-light">
         <div className="flex flex-row items-center justify-center gap-2">
-          <div>Already have an account?</div>
+          <div>Don&apos;t have an account?</div>
           <div
             onClick={() => {
-              registerModal.onClose();
-              loginModal.onOpen();
+              registerModal.onOpen();
+              loginModal.onClose();
             }}
             className="
             text-neutral-800
@@ -113,7 +108,7 @@ const RegisterModal = () => {
             hover:underline
           "
           >
-            Log in
+            Register
           </div>
         </div>
       </div>
@@ -123,11 +118,11 @@ const RegisterModal = () => {
   return (
     <Modal
       disabled={isLoading}
-      isOpen={registerModal.isOpen}
-      title="Register"
+      isOpen={loginModal.isOpen}
+      title="Login"
       actionLabel="Continue"
       onClose={() => {
-        registerModal.onClose();
+        loginModal.onClose();
         reset();
       }}
       onSubmit={handleSubmit(onSubmit)}
@@ -137,4 +132,4 @@ const RegisterModal = () => {
   );
 };
 
-export default RegisterModal;
+export default LoginModal;

@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId // mongodb için ObjectId tipinde benzersiz kimlik
+  name String?
+  email String? @unique
+  emailVerified DateTime? // e-posta doğrulama tarihi
+  image String?
+  hashedPassword String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  favoriteIds String[] @db.ObjectId
+
+  accounts Account[] // Kullanıcının hesapları (google, github gibi) -> one to many ilişkisi
+  listings Listing[]
+  reservations Reservation[]
+}
+
+model Account {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId // bu account'un hangi kullanıcıya ait olduğunu gösteren foreign key
+  type String // hesap tipi (oauth, credentials)
+  provider String // hangi provider'dan geldi (google, github)
+  providerAccountId String // provider tarafındaki benzersiz kullanıcı id'si
+  refresh_token String? @db.String // oauth için refresh token
+  access_token String? @db.String // oauth için access token
+  expires_at Int? // token'ın bitiş tarihi
+  token_type String? // token tipi (bearer, refresh)
+  scope String? // erişim, yetki kapsamı
+  id_token String? @db.String // id token
+  session_state String? // oturum durum bilgisi
+
+  // ilişki tanımı: Account -> User (N:1)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // bir kullanıcının birden fazla hesabı olabilir ve onDelete Cascade -> bir kullanıcı silinirse o kullanıcıya bağlı tüm hesaplar silinir.
+
+  @@unique([provider, providerAccountId]) // aynı provider ve providerAccountId kombinasyonu tekrar edemez. Yani her provider için sadece bir hesap olabilir. Örnek -> aynı google hesabı iki kere kayıt olmaz. 
+}
+
+model Listing {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  description String
+  imageSrc String
+  createdAt DateTime @default(now())
+  category String
+  roomCount Int
+  bathroomCount Int
+  guestCount Int
+  locationValue String
+  userId String @db.ObjectId
+  price Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reservation Reservation[]
+}
+
+model Reservation {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  listingId String @db.ObjectId
+  startDate DateTime
+  endDate DateTime
+  totalPrice Int
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
