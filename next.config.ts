@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
       "avatars.githubusercontent.com",
       "lh3.googleusercontent.com",
       "flagcdn.com",
+      "res.cloudinary.com",
     ],
   },
   /* config options here */
