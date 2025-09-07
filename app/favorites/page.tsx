@@ -4,18 +4,28 @@ import getCurrentUser from "../actions/getCurrentUser";
 import getFavorites from "../actions/getFavorites";
 import { SafeUser } from "../types";
 import ListingCard from "../components/listings/ListingCard";
-import { Listing } from "../generated/prisma";
+import Heading from "../components/Heading";
+import Button from "../components/Button";
+import EmptyState from "../components/EmptyState";
 
 const FavoritesPage = async () => {
   const currentUser = await getCurrentUser();
 
   const favorites = await getFavorites(currentUser?.id as SafeUser["id"]);
 
-  console.log("favoriteListings -> ", favorites);
-
+  if (!currentUser) return null;
   return (
     <Container>
-      <h1 className="text-neutral-800 font-bold text-4xl">My Favorites</h1>
+      {favorites.length !== 0 && (
+        <h1 className="text-neutral-800 font-bold text-4xl">My Favorites</h1>
+      )}
+
+      {favorites.length === 0 && (
+        <EmptyState
+          title="No favorites found"
+          subtitle="Looks like you have no favorites yet."
+        />
+      )}
       <div
         className="
         pt-6
