@@ -9,6 +9,7 @@ import getCurrentUser from "./actions/getCurrentUser";
 import { SafeUser } from "./types";
 import "./globals.css";
 import RentModal from "./components/modals/RentModal";
+import SearchModal from "./components/modals/SearchModal";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default async function RootLayout({
           <ToasterProvider />
           <LoginModal />
           <RegisterModal />
+          <SearchModal />
           <RentModal />
           <Navbar currentUser={currentUser as SafeUser | null} />
         </ClientOnly>

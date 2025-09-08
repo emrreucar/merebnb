@@ -6,8 +6,15 @@ import EmptyState from "./components/EmptyState";
 import ListingCard from "./components/listings/ListingCard";
 import { SafeUser } from "./types";
 
-export default async function Home() {
-  const listings = await getListings();
+interface HomeProps {
+  searchParams: Promise<{
+    [key: string]: string | string[] | undefined;
+  }>;
+}
+
+export default async function Home({ searchParams }: HomeProps) {
+  const resolvedSearchParams = await searchParams;
+  const listings = await getListings(resolvedSearchParams);
   const currentUser = await getCurrentUser();
 
   if (listings.length === 0) {

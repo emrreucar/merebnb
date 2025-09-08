@@ -3,13 +3,9 @@ import { NextResponse } from "next/server";
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import prisma from "@/app/libs/prismadb";
 
-interface IParams {
-  reservationId?: string;
-}
-
 export async function DELETE(
   request: Request,
-  { params }: { params: IParams }
+  { params }: { params: Promise<{ reservationId: string }> }
 ) {
   const currentUser = await getCurrentUser();
 
@@ -17,7 +13,7 @@ export async function DELETE(
     return NextResponse.error();
   }
 
-  const { reservationId } = params;
+  const { reservationId } = await params;
 
   if (!reservationId || typeof reservationId !== "string") {
     throw new Error("Invalid ID");

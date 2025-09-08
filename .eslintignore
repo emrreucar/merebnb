@@ -1,0 +1,8 @@
+# Generated files
+app/generated/
+prisma/generated/
+**/generated/
+node_modules/
+
+# Prisma files
+**/prisma/wasm.js

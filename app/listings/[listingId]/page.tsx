@@ -1,21 +1,20 @@
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import getListingById from "@/app/actions/getListingById";
 import ClientOnly from "@/app/components/ClientOnly";
-import Container from "@/app/components/Container";
 import EmptyState from "@/app/components/EmptyState";
 import React from "react";
 import ListingClient from "./ListingClient";
-import { SafeListing, SafeReservation, SafeUser } from "@/app/types";
-import { Listing } from "@/app/generated/prisma";
+import { SafeListing, SafeUser } from "@/app/types";
 import getReservations from "@/app/actions/getReservations";
 
 interface IParams {
   listingId?: string;
 }
 
-const SingleListingPage = async ({ params }: { params: IParams }) => {
-  const listing = await getListingById(params);
-  const reservations = await getReservations(params);
+const SingleListingPage = async ({ params }: { params: Promise<IParams> }) => {
+  const { listingId } = await params;
+  const listing = await getListingById(listingId as IParams);
+  const reservations = await getReservations(listingId as IParams);
   const currentUser = await getCurrentUser();
 
   if (!listing) {
