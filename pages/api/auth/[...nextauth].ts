@@ -10,6 +10,13 @@ import bcrypt from "bcrypt";
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
+  callbacks: {
+    redirect({url, baseUrl}){
+      if(url.startsWith("/")) return `${baseUrl}${url}`;
+      if(new URL(url).origin === baseUrl) return url;
+      return baseUrl;
+    }
+  },
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_ID as string,
