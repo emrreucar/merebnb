@@ -1,3 +1,6 @@
+<img width="2534" height="1224" alt="image" src="https://github.com/user-attachments/assets/11ce4229-05b2-4b46-b6e7-da17bbb4c84f" />
+
+
 # 🏠 Airbnb Clone - Modern Konaklama Platformu
 
 Next.js 15 ve modern web teknolojileri kullanılarak geliştirilmiş, Airbnb'den ilham alınmış konaklama rezervasyon platformu.
